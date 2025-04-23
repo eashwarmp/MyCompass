@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "Pre-lab Assignment | Bio - 501",
+    "subtitle": "Due today at 5 PM",
+    "icon": "book",
+    "cover": "https://images.unsplash.com/photo-1491975474562-1f4e30bc9468?q=80&w=1587&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "location": "Room 101, Science Building"
+  },
+  {
+    "id": "2",
+    "title": "Research Paper Citations",
+    "subtitle": "April 24 (Mon) 11:59 PM",
+    "icon": "book",
+    "cover": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "location": "Library Conference Room"
+  },
+  {
+    "id": "3",
+    "title": "Resume Workshop",
+    "subtitle": "April 21 (Mon) 9–12 PM",
+    "icon": "briefcase",
+    "cover": "https://plus.unsplash.com/premium_photo-1661779134041-9d618ec4c812?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "location": "Career Center, Room 202"
+  },
+  {
+    "id": "4",
+    "title": "Lavender Graduation",
+    "subtitle": "April 22 (Tue) 9–12 PM",
+    "icon": "graduation",
+    "cover": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=60",
+    "location": "Auditorium, Main Hall"
+  },
+  {
+    "id": "5",
+    "title": "Course Registration for Fall 2025",
+    "subtitle": "May 12 (Wed) 3–4 PM",
+    "icon": "calendar",
+    "cover": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=60",
+    "location": "Online Portal"
+  },
+  {
+    "id": "6",
+    "title": "The 5K Challenge",
+    "subtitle": "May 2 (Fri) 12–2 PM",
+    "icon": "campus",
+    "cover": "https://plus.unsplash.com/premium_photo-1726403421924-eeb265f8c57a?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "location": "Campus Track Field"
+  }
+]
