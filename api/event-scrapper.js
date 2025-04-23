@@ -16,37 +16,10 @@ const OPEN_AI_URL = "https://api.openai.com/v1/chat/completions";
 // 🌐 URLs to scrape
 const PURDUE_EVENTS_URL = "https://events.purdue.edu/";
 
-// 🧹 Scrape raw event data from Purdue Events
-// async function scrapePurdueEvents() {
-//   const res = await axios.get(PURDUE_EVENTS_URL);
-//   const $ = cheerio.load(res.data);
-//   console.log("🟡 Scraping Purdue Events...", $);
-//   const events = [];
-
-//   $(".event-card").each((i, el) => {
-//     const title = $(el).find(".event-title").text().trim();
-//     const link = $(el).find("a").attr("href");
-//     const date = $(el).find(".event-date").text().trim();
-//     const location = $(el).find(".event-location").text().trim();
-
-//     if (title) {
-//       events.push({
-//         title,
-//         date,
-//         location,
-//         link: link ? `https://events.purdue.edu${link}` : null,
-//       });
-//     }
-//   });
-
-//   return events;
-// }
-
+// 🧹 Scrape events from listing page
 async function fetchPurdueEvents() {
-  const url = "https://events.purdue.edu";
-  const response = await axios.get(url);
-  const $ = cheerio.load(response.data); // Parse the HTML
-
+  const response = await axios.get(PURDUE_EVENTS_URL);
+  const $ = cheerio.load(response.data);
   const events = [];
 
   $(".em-card").each((i, el) => {
@@ -54,15 +27,19 @@ async function fetchPurdueEvents() {
     const date = $(el).find(".em-card_event-text").first().text().trim();
     const location = $(el).find(".em-card_event-text a").text().trim();
     const link = $(el).find(".em-card_title a").attr("href");
-    const img = $(el).find("img").attr("src");
+    const image = $(el).find("img").attr("src");
+
+    const fullLink = link?.startsWith("http")
+      ? link
+      : `https://events.purdue.edu${link}`;
 
     if (title) {
       events.push({
         title,
         date,
         location,
-        link: link ? `https://events.purdue.edu${link}` : null,
-        image: img ? img : null,
+        link: fullLink,
+        image,
       });
     }
   });
@@ -70,53 +47,27 @@ async function fetchPurdueEvents() {
   return events;
 }
 
-// 🤖 Format scraped data via OpenAI GPT
-async function formatEventsWithOpenAI(rawEvents) {
-  const prompt = `
-    You are an event data formatter. You will receive a list of university events. Each event has a combined 'date' field that may contain both the date and time.
-    
-    Today's date is: ${new Date().toDateString()}
-    
-    Your task is to:
-    - Parse 'date' into two fields:
-      - 'date': keep the full readable date as-is (e.g., "Mon, May 5, 2025")
-      - 'time': extract the time portion (e.g., "3pm to 4pm") or use null if not present
-    - Keep the rest of the fields: title, location, link, image
-    - Add:
-      - 'category' (guess from title, e.g., "Seminar", "Music", "Career")
-      - 'urgency': high if the event is within 3 days of today, otherwise medium or low
-      - 'tags': 2–4 relevant lowercase keywords based on title and category
-    
-    Return a valid JSON array of formatted events. Do NOT include any explanation or markdown, only the JSON array.
-    
-    Input:
-    ${JSON.stringify(rawEvents.slice(0, 10), null, 2)}
-    `;
+async function enrichEventsWithDetails(events) {
+  const enriched = await Promise.all(
+    events.map(async (event) => {
+      try {
+        const res = await axios.get(event.link);
+        const $ = cheerio.load(res.data);
 
-  //   const completion = await openai.createChatCompletion({
-  //     model: "gpt-4-1106-preview",
-  //     messages: [
-  //       {
-  //         role: "system",
-  //         content:
-  //           "You are a helpful formatter that turns messy event info into structured JSON.",
-  //       },
-  //       { role: "user", content: prompt },
-  //     ],
-  //     temperature: 0.4,
-  //     max_tokens: 1000,
-  //   });
+        // Fill missing date
+        if (!event.date || event.date === "") {
+          const fullDate = $(".em-about_event-date").text().trim();
+          if (fullDate) event.date = fullDate;
+        }
 
-  const systemMessage = {
-    role: "system",
-    content:
-      "You are a helpful formatter that turns messy event info into structured JSON.",
-  };
-  const userMessage = {
-    role: "user",
-    content: `${JSON.stringify(rawEvents, null, 2)}`,
-  };
+        // Fill missing description
+        if (!event.description || event.description === "") {
+          const descriptionParagraphs = $(".em-about_description p")
+            .map((i, el) => $(el).text().trim())
+            .get()
+            .filter(Boolean);
 
+<<<<<<< HEAD
   const data = {
     model: "gpt-4o",
     messages: [
@@ -126,23 +77,36 @@ async function formatEventsWithOpenAI(rawEvents) {
     temperature: 0.2,
     max_tokens: 1200,
   };
+=======
+          if (descriptionParagraphs.length) {
+            event.description = descriptionParagraphs.join("\n\n");
+          }
+        }
+      } catch (err) {
+        console.warn(`❌ Could not enrich event: ${event.title}`, err.message);
+      }
+>>>>>>> 5a9be3cacc9b8ed66879fbbe0b29d909e69969f9
 
-  const response = await axios.post(OPEN_AI_URL, data, { headers });
-  const output = response.data.choices[0].message.content;
-  return output;
+      return event;
+    })
+  );
+
+  return enriched;
 }
 
 // 🚀 Main runner
 (async () => {
   try {
-    const rawEvents = await fetchPurdueEvents();
-    console.log("🟡 Scraped Raw Events:", rawEvents);
-    if (rawEvents.length === 0) {
-      console.log("No events found.");
-      return;
-    }
-    const formattedEvents = await formatEventsWithOpenAI(rawEvents);
-    console.log("\n✅ Formatted Events:\n", formattedEvents);
+    const scraped = await fetchPurdueEvents();
+    console.log("🔍 Initial Events:", scraped.length);
+
+    const enriched = await enrichEventsWithDetails(scraped);
+    console.log(
+      "✅ Final Enriched Events:\n",
+      JSON.stringify(enriched, null, 2)
+    );
+    // const formattedEvents = await formatEventsWithOpenAI(rawEvents);
+    // console.log("\n✅ Formatted Events:\n", formattedEvents);
   } catch (err) {
     console.error("❌ Error:", err.message);
   }
