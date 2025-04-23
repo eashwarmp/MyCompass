@@ -67,17 +67,6 @@ async function enrichEventsWithDetails(events) {
             .get()
             .filter(Boolean);
 
-<<<<<<< HEAD
-  const data = {
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: "You are a JSON formatter." },
-      { role: "user", content: prompt },
-    ],
-    temperature: 0.2,
-    max_tokens: 1200,
-  };
-=======
           if (descriptionParagraphs.length) {
             event.description = descriptionParagraphs.join("\n\n");
           }
@@ -85,7 +74,6 @@ async function enrichEventsWithDetails(events) {
       } catch (err) {
         console.warn(`❌ Could not enrich event: ${event.title}`, err.message);
       }
->>>>>>> 5a9be3cacc9b8ed66879fbbe0b29d909e69969f9
 
       return event;
     })
