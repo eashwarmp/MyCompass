@@ -10,6 +10,9 @@ type Props = {
     title: string;
     subtitle: string;
     icon: string;
+    cover: string;
+    location: string;
+    description?: string;
   };
 };
 
@@ -28,7 +31,7 @@ export default function TaskCard({ event }: Props) {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate("Details", { id: event.id })}
+      onPress={() => navigation.navigate("Details", { event })}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
     >
       <View style={styles.row}>

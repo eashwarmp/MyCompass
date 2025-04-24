@@ -6,8 +6,9 @@ import {
   Text,
   Pressable,
   ScrollView,
+  Linking,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
@@ -15,42 +16,61 @@ import { useEvents } from "../hooks/useEvents";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function EventDetailScreen() {
-  const { params } = useRoute<any>();
-  const { events } = useEvents();
-  const event = events.find((e) => e.id === params.id)!;
+  const { params } = useRoute<RouteProp<RootStackParamList, "Details">>();
+  const { event } = params;
+  // const event = events.find((e) => e.id === params.id);
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  if (!event) return null; // still loading
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* back button */}
       <Pressable style={styles.back} onPress={navigation.goBack}>
         <Feather name="chevron-left" size={24} color="#fff" />
       </Pressable>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Image source={{ uri: event.cover }} style={styles.cover} />
+        {event.cover && (
+          <Image source={{ uri: event.cover }} style={styles.cover} />
+        )}
         <Text style={styles.h1}>{event.title}</Text>
-        <Text style={styles.subtitle}>{event.subtitle}</Text>
-        <Text style={styles.subtitle}>{event.location}</Text>
 
-        {/* CTA buttons */}
-        {["Add To Calendar", "Get Directions", "More Details"].map((txt) => (
+        {/* date / time */}
+        {!!event.subtitle && (
+          <Text style={styles.subtitle}>{event.subtitle}</Text>
+        )}
+        {!!event.location && (
+          <Text style={styles.subtitle}>{event.location}</Text>
+        )}
+
+        {/* description */}
+        {!!event.description && (
+          <Text style={[styles.subtitle, { marginTop: 12, lineHeight: 20 }]}>
+            {event.description}
+          </Text>
+        )}
+
+        {/* link to original page (if you want) */}
+        {!!event.link && (
           <Pressable
-            key={txt}
-            style={({ pressed }) => [styles.btn, pressed && { opacity: 0.7 }]}
+            style={({ pressed }) => [styles.btn, pressed && { opacity: 0.6 }]}
+            onPress={() => Linking.openURL(event.link!)}
           >
             <Feather
-              name="corner-up-right"
+              name="external-link"
               size={14}
               color="#fff"
               style={{ marginRight: 6 }}
             />
-            <Text style={styles.btnTxt}>{txt}</Text>
+            <Text style={styles.btnTxt}>Open original page</Text>
           </Pressable>
-        ))}
+        )}
       </ScrollView>
 
-      {/* Chat bar gradient */}
+      {/* fake chat bar */}
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.8)"]}
         style={styles.chatBoxHolder}

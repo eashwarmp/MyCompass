@@ -82,20 +82,22 @@ async function enrichEventsWithDetails(events) {
   return enriched;
 }
 
-// 🚀 Main runner
-(async () => {
-  try {
-    const scraped = await fetchPurdueEvents();
-    console.log("🔍 Initial Events:", scraped.length);
+// // 🚀 Main runner
+// (async () => {
+//   try {
+//     const scraped = await fetchPurdueEvents();
+//     console.log("🔍 Initial Events:", scraped.length);
 
-    const enriched = await enrichEventsWithDetails(scraped);
-    console.log(
-      "✅ Final Enriched Events:\n",
-      JSON.stringify(enriched, null, 2)
-    );
-    // const formattedEvents = await formatEventsWithOpenAI(rawEvents);
-    // console.log("\n✅ Formatted Events:\n", formattedEvents);
-  } catch (err) {
-    console.error("❌ Error:", err.message);
-  }
-})();
+//     const enriched = await enrichEventsWithDetails(scraped);
+//     console.log(
+//       "✅ Final Enriched Events:\n",
+//       JSON.stringify(enriched, null, 2)
+//     );
+//     // const formattedEvents = await formatEventsWithOpenAI(rawEvents);
+//     // console.log("\n✅ Formatted Events:\n", formattedEvents);
+//   } catch (err) {
+//     console.error("❌ Error:", err.message);
+//   }
+// })();
+
+module.exports = { fetchPurdueEvents, enrichEventsWithDetails };

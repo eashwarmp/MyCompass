@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "server": "cd api && nodemon app.js "
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
@@ -16,9 +17,12 @@
     "@react-navigation/native-stack": "^7.3.10",
     "axios": "^1.8.4",
     "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
     "expo": "~52.0.46",
     "expo-linear-gradient": "~14.0.2",
     "expo-status-bar": "~2.0.1",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
     "openai": "^4.95.1",
     "puppeteer": "^24.6.1",
     "react": "18.3.1",
