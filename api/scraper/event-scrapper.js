@@ -5,6 +5,8 @@ const cheerio = require("cheerio");
 const { Configuration, OpenAIApi } = require("openai");
 const puppeteer = require("puppeteer");
 
+const eventCache = new Map();
+
 const headers = {
   Authorization: "Bearer {API_KEY}",
   "Content-Type": "application/json",

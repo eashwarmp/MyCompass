@@ -14,6 +14,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { useEvents } from "../hooks/useEvents";
 import { LinearGradient } from "expo-linear-gradient";
+import LogoButton from "../components/LogoButton";
+import CenteredLogoHeader from "../components/CenteredLogoHeader";
 
 export default function EventDetailScreen() {
   const { params } = useRoute<RouteProp<RootStackParamList, "Details">>();
@@ -27,10 +29,7 @@ export default function EventDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* back button */}
-      <Pressable style={styles.back} onPress={navigation.goBack}>
-        <Feather name="chevron-left" size={24} color="#fff" />
-      </Pressable>
+      <CenteredLogoHeader />
 
       <ScrollView contentContainerStyle={styles.content}>
         {event.cover && (
@@ -89,7 +88,7 @@ const styles = StyleSheet.create({
     top: 50,
     left: 24,
   },
-  content: { paddingTop: 80, paddingHorizontal: 24, paddingBottom: 200 },
+  content: { paddingTop: 40, paddingHorizontal: 24, paddingBottom: 200 },
   cover: {
     width: "100%",
     height: 200,
@@ -124,5 +123,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#555",
     borderRadius: 22,
+  },
+  logoContainer: {
+    paddingTop: 40,
+    alignItems: "center",
+    marginBottom: 20,
   },
 });

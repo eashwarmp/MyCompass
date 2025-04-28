@@ -31,7 +31,7 @@ export default function TaskCard({ event }: Props) {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate("Details", { event })}
+      onPress={() => navigation.navigate("EventPreview", { event })}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
     >
       <View style={styles.row}>

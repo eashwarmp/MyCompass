@@ -6,18 +6,20 @@ import { EventItem } from "../interfaces/events";
 export function useEvents() {
   const [events, setEvents] = useState<EventItem[]>([]);
 
+  async function fetchEvents() {
+    try {
+      const { data } = await axios.get<EventItem[]>(
+        "http://localhost:9000/api/events"
+      );
+      setEvents(data);
+    } catch (err) {
+      console.error("fetch events failed:", err);
+    }
+  }
+
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await axios.get<EventItem[]>(
-          "http://localhost:9000/api/events"
-        ); // proxy or full URL
-        setEvents(data);
-      } catch (err) {
-        console.error("fetch events failed:", err);
-      }
-    })();
+    fetchEvents();
   }, []);
 
-  return { events };
+  return { events, reload: fetchEvents };
 }

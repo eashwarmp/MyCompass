@@ -5,11 +5,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import HeaderBar from "../components/HeaderBar";
 
 export default function HomeScreen() {
-  const { events } = useEvents();
+  const { events, reload } = useEvents();
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderBar />
+      <HeaderBar onReload={reload} />
 
       <FlatList
         data={events}
