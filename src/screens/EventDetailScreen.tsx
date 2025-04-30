@@ -14,7 +14,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { useEvents } from "../hooks/useEvents";
 import { LinearGradient } from "expo-linear-gradient";
-import LogoButton from "../components/LogoButton";
 import CenteredLogoHeader from "../components/CenteredLogoHeader";
 
 export default function EventDetailScreen() {
