@@ -25,13 +25,13 @@ except Exception as e:
 PURDUE_EVENTS_URL = "https://events.purdue.edu/"
 
 # OpenAI Model Configuration
-OPENAI_MODEL = "gpt-4o" # Or "gpt-4-turbo", etc.
+OPENAI_MODEL = "gpt-4o-mini" # Or "gpt-4-turbo", etc.
 MAX_TOKENS_COMPLETION = 4000 # Adjust based on expected output length and model limits
 
 # Controls how many events are sent to OpenAI in one batch.
 # Set to None to send all filtered events (beware of token limits/costs).
 # Set to a number (e.g., 15) to limit the batch size.
-EVENT_BATCH_SIZE_FOR_OPENAI = None
+EVENT_BATCH_SIZE_FOR_OPENAI = 7
 
 # Browser-like Headers for Requests
 REQUEST_HEADERS = {
@@ -211,7 +211,7 @@ Your task is to process the following JSON input array:
     - 'tags': Generate 2-4 relevant lowercase keywords based on title, category, and description.
 
 Return ONLY a valid JSON array containing the formatted event objects for ALL the events provided in the input. Do NOT include any introduction, explanation, markdown formatting (like ```json), or concluding remarks. Ensure the output is a single, complete JSON array.
-
+The output should be arranged according to the priority.
 Input JSON ({num_events_sending} events):
 {json.dumps(events_to_process, indent=2)}
 """
@@ -291,9 +291,7 @@ def main():
         for event in raw_events:
             if all(event.get(key) for key in required_keys):
                 filtered_events.append(event)
-            # else: # Optional logging for skipped events
-            #      missing = [key for key in required_keys if not event.get(key)]
-            #      print(f"   Skipping event '{event.get('title', 'Untitled')}': Missing {missing}")
+
 
         print(f"✅ Kept {len(filtered_events)} events after filtering.")
 
