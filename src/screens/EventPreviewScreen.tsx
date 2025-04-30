@@ -12,7 +12,6 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import LogoButton from "../components/LogoButton";
 import CenteredLogoHeader from "../components/CenteredLogoHeader";
 
 export default function EventPreviewScreen() {
