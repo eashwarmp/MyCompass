@@ -71,14 +71,6 @@ def calculate_urgency_and_parse_date(date_str, today):
     parsed_date = date_str # Default to original if parsing fails
     event_date = None
 
-    # Try to parse date - this is simplified and might need improvement
-    # based on actual date formats encountered.
-    # Let's use the LLM for parsing initially as it's more robust to variations.
-    # However, for urgency calculation *without* the LLM, we need some parsing logic.
-    # A robust date parser library would be ideal here (e.g., `dateutil.parser.parse`)
-    # but for this example, we'll rely on the LLM output for `parsed_date` and `urgency`.
-    # The logic below is a *fallback* or for potential pre-processing.
-
     try:
         # Simple attempts for common formats or relative terms
         if 'today' in date_str_lower:
