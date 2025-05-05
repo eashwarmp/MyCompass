@@ -6,6 +6,7 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -13,6 +14,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import CenteredLogoHeader from "../components/CenteredLogoHeader";
+
+import { Linking } from "react-native";
 
 export default function EventPreviewScreen() {
   const { params } = useRoute<any>();
@@ -38,14 +41,24 @@ export default function EventPreviewScreen() {
 
         {/* Event Card */}
         <View style={styles.card}>
-          <Image source={{ uri: event.cover }} style={styles.image} />
+          <Image source={{ uri: event.image }} style={styles.image} />
           <View style={styles.cardContent}>
             <Text style={styles.cardTitle}>{event.title}</Text>
-            <Text style={styles.cardSubtitle}>{event.subtitle}</Text>
+            <Text style={styles.cardSubtitle}>{event.title}</Text>
             <Text style={styles.cardLocation}>{event.location}</Text>
 
             <Pressable
-              onPress={() => navigation.navigate("Details", { event })}
+              onPress={() => {
+                if (event.link) {
+                  if (Platform.OS === "web") {
+                    window.open(event.link, "_blank");
+                  } else {
+                    Linking.openURL(event.link);
+                  }
+                } else {
+                  navigation.navigate("Details", { event });
+                }
+              }}
               style={styles.viewMoreBtn}
             >
               <Text style={styles.viewMoreText}>View more</Text>

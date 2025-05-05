@@ -8,11 +8,16 @@ from datetime import date, datetime, timedelta
 import traceback
 import time
 import re # Needed for cleaning aria-label
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 # --- Flask Setup ---
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app, resources={r"/events": {"origins": "http://localhost:8081"}})
 
 # --- Configuration ---
 # Load environment variables from .env file
@@ -33,8 +38,17 @@ except Exception as e:
 # URL to scrape
 PURDUE_EVENTS_URL = "https://events.purdue.edu/"
 
+def timed(fn):
+    def wrapper(*args, **kwargs):
+        t0 = time.time()
+        result = fn(*args, **kwargs)
+        t1 = time.time()
+        print(f"⏱ {fn.__name__!r} took {t1-t0:.2f}s")
+        return result
+    return wrapper
+
 # OpenAI Model Configuration
-OPENAI_MODEL = "gpt-4o-mini" # Or "gpt-4-turbo", etc.
+OPENAI_MODEL = "gpt-3.5-turbo" # Or "gpt-4-turbo", etc.
 MAX_TOKENS_COMPLETION = 4000 # Adjust based on expected output length and model limits
 
 # Controls how many events are sent to OpenAI in one batch.
@@ -122,6 +136,7 @@ def calculate_urgency_and_parse_date(date_str, today):
     return parsed_date, urgency # Note: This function doesn't handle time extraction, LLM does.
 
 # --- Web Scraping Function ---
+@timed
 def fetch_purdue_events():
     """
     Scrapes raw event data from Purdue Events.
@@ -186,7 +201,7 @@ def fetch_purdue_events():
         if full_link:
             # print(f"   ➡️ Fetching detail page: {full_link}") # Too verbose
             try:
-                time.sleep(0.1) # Politeness delay - slightly reduced for potential web service use
+                # time.sleep(0.1) # Politeness delay - slightly reduced for potential web service use
                 detail_response = requests.get(full_link, headers=REQUEST_HEADERS, timeout=15)
                 detail_response.raise_for_status()
                 detail_soup = BeautifulSoup(detail_response.text, 'lxml')
@@ -253,6 +268,7 @@ def fetch_purdue_events():
     return events, None # Return events list and None for error
 
 # --- OpenAI Formatting Function ---
+@timed
 def format_events_with_openai(events_to_process):
     """Formats scraped event data using OpenAI GPT, including summarizing descriptions."""
 
@@ -360,6 +376,7 @@ def get_events():
     Returns a JSON array of formatted events.
     """
     print("\n--- Received request to /events ---")
+    t_start = time.time()
     total_start_time = time.time()
 
     # --- Scraping ---
@@ -418,6 +435,9 @@ def get_events():
 
     if openai_error:
          return jsonify({"status": "error", "message": openai_error, "step": "openai_call"}), 500
+    
+    t_end = time.time()
+    print(f"⏱ Total /events handler took {t_end - t_start:.2f}s")
 
     # --- Process Response ---
     parsed_json = None
@@ -489,26 +509,26 @@ def get_events():
                 # This is a simple sort and might not handle date ranges perfectly.
                 urgency_order = {'high': 0, 'medium': 1, 'low': 2}
                 def sort_key(event):
-                     urgency_val = urgency_order.get(event.get('urgency', 'low'), 2)
-                     # Try to parse date for sorting (using LLM's parsed_date)
-                     date_val = datetime.max.date() # Default to future if parsing fails
-                     llm_parsed_date_str = event.get('parsed_date')
-                     if llm_parsed_date_str:
-                          try:
-                              date_part = llm_parsed_date_str.split(' - ')[0]
-                              # Attempt to parse common formats
-                              for fmt in ["%a, %b %d, %Y", "%b %d, %Y"]:
-                                  try:
-                                      date_val = datetime.strptime(date_part, fmt).date()
-                                      break
-                                  except ValueError:
-                                      continue
-                          except Exception:
-                             pass # Keep default date_val if parsing fails
+                    #  urgency_val = urgency_order.get(event.get('urgency', 'low'), 2)
+                    #  # Try to parse date for sorting (using LLM's parsed_date)
+                    #  date_val = datetime.max.date() # Default to future if parsing fails
+                    #  llm_parsed_date_str = event.get('parsed_date')
+                    #  if llm_parsed_date_str:
+                    #       try:
+                    #           date_part = llm_parsed_date_str.split(' - ')[0]
+                    #           # Attempt to parse common formats
+                    #           for fmt in ["%a, %b %d, %Y", "%b %d, %Y"]:
+                    #               try:
+                    #                   date_val = datetime.strptime(date_part, fmt).date()
+                    #                   break
+                    #               except ValueError:
+                    #                   continue
+                    #       except Exception:
+                    #          pass # Keep default date_val if parsing fails
 
-                     return (urgency_val, date_val)
+                    #  return (urgency_val, date_val)
 
-                parsed_json.sort(key=sort_key)
+                 parsed_json.sort(key=sort_key)
                 print("✅ Sorted events by urgency and date.")
                 # --- End urgency check/sort fallback ---
 
