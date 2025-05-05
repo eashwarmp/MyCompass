@@ -1,10 +1,13 @@
 export interface EventItem {
-  id: string; // ← comes from API
   title: string;
-  subtitle: string; // date / time
-  icon: string; // “calendar” for now
-  cover: string; // image url (or placeholder)
+  date: string; // full date-time string
+  time?: string;
   location: string;
-  description?: string; // NEW
-  link?: string; // optional – opens original site
+  description: string;
+  image: string; // was `cover`
+  link: string;
+  short_description?: string;
+  category?: string;
+  tags?: string[];
+  ranking?: number;
 }

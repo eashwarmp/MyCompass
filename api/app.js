@@ -4,13 +4,13 @@ const cors = require("cors");
 const {
   fetchPurdueEvents,
   enrichEventsWithDetails,
-} = require("./scraper/event-scrapper");
+  formatEventsWithOpenAI,
+} = require("./scraper/modified-event-scrapper");
 
 const app = express();
 const PORT = 9000;
 
 app.use(cors());
-// app.use(cors({ origin: "http://localhost:8081" }));
 // ✅ allow all origins
 app.use(express.json()); // just in case for body parsing
 
@@ -19,8 +19,7 @@ const router = express.Router();
 
 router.get("/events", async (req, res) => {
   try {
-    console.log("Inside");
-    console.time("Total fetch");
+    console.time("⏱ /api/events");
 
     console.time("Fetch raw events");
     const rawEvents = await fetchPurdueEvents();
@@ -28,25 +27,20 @@ router.get("/events", async (req, res) => {
 
     console.time("Enrich events");
     const enrichedEvents = await enrichEventsWithDetails(rawEvents);
+    console.log("Events ----------------------_> ", enrichedEvents);
     console.timeEnd("Enrich events");
+    const formatted = enrichedEvents
+      .filter((e) => e.title && e.date && e.link && e.description)
+      .slice(0, 7);
+    console.log("🚀 Sending", formatted.length, "events to GPT…");
 
+    console.time("OpenAI Call");
+    const openAIResp = await formatEventsWithOpenAI(formatted);
     console.timeEnd("Total fetch");
 
-    const filteredEvents = enrichedEvents.filter(
-      (event) => event.date && event.date.trim() !== ""
-    );
+    console.timeEnd("⏱ /api/events");
 
-    res.json(
-      filteredEvents.map((event, index) => ({
-        id: String(index + 1),
-        title: event.title,
-        subtitle: event.date,
-        icon: "calendar",
-        cover: event.image || "https://fallback.image/url.jpg",
-        location: event.location || "TBA",
-        description: event.description || "",
-      }))
-    );
+    res.json(openAIResp);
   } catch (err) {
     res
       .status(500)

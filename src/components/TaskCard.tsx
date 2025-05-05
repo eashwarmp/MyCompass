@@ -3,25 +3,18 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { EventItem } from "../interfaces/events";
 
 type Props = {
-  event: {
-    id: string;
-    title: string;
-    subtitle: string;
-    icon: string;
-    cover: string;
-    location: string;
-    description?: string;
-  };
+  event: EventItem;
 };
 
 const iconMap: Record<string, any> = {
-  book: require("../../assets/images/categories/course.png"),
+  course: require("../../assets/images/categories/course.png"),
   campus: require("../../assets/images/categories/campus.png"),
-  briefcase: require("../../assets/images/categories/career.png"),
-  graduation: require("../../assets/images/categories/social.png"),
-  calendar: require("../../assets/images/categories/bell.png"),
+  career: require("../../assets/images/categories/career.png"),
+  social: require("../../assets/images/categories/social.png"),
+  other: require("../../assets/images/categories/bell.png"),
   user: require("../../assets/images/avatar.png"), // fallback
 };
 
@@ -36,14 +29,22 @@ export default function TaskCard({ event }: Props) {
     >
       <View style={styles.row}>
         <View style={styles.iconCircle}>
-          <Image
+          {/* <Image
             source={iconMap[event.icon] || iconMap.user}
+            style={styles.iconImage}
+          /> */}
+          <Image
+            source={
+              iconMap[
+                event.category ? event.category.toLowerCase() : "calendar"
+              ]
+            } // or your default icon
             style={styles.iconImage}
           />
         </View>
         <View style={styles.texts}>
           <Text style={styles.title}>{event.title}</Text>
-          <Text style={styles.subtitle}>{event.subtitle}</Text>
+          <Text style={styles.subtitle}>{event.date}</Text>
         </View>
         <Feather name="chevron-right" size={18} color="#aaa" />
       </View>
