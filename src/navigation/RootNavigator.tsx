@@ -5,8 +5,8 @@ import EventPreviewScreen from "../screens/EventPreviewScreen";
 import { EventItem } from "../interfaces/events";
 
 export type RootStackParamList = {
-  Home: undefined;
-  EventPreview: { event: EventItem }; // Add this line
+  Home: { audience: "student" | "faculty" };
+  EventPreview: { event: EventItem };
   Details: { event: EventItem };
 };
 

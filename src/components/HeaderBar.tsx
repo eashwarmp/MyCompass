@@ -8,7 +8,13 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 
-export default function HeaderBar({ onReload }: { onReload?: () => void }) {
+export default function HeaderBar({
+  onReload,
+  audience,
+}: {
+  onReload?: () => void;
+  audience: "student" | "faculty";
+}) {
   const rotation = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -22,6 +28,11 @@ export default function HeaderBar({ onReload }: { onReload?: () => void }) {
     });
     onReload?.(); // reload events on logo click
   };
+
+  const avatarImage =
+    audience === "faculty"
+      ? require("../../assets/images/faculty-avatar.png")
+      : require("../../assets/images/student-avatar.png");
 
   return (
     <View style={styles.container}>
@@ -39,10 +50,7 @@ export default function HeaderBar({ onReload }: { onReload?: () => void }) {
       </Pressable>
 
       {/* Right: Avatar */}
-      <Image
-        source={require("../../assets/images/avatar.png")}
-        style={styles.avatar}
-      />
+      <Image source={avatarImage} style={styles.avatar} />
     </View>
   );
 }

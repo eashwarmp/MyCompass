@@ -3,22 +3,40 @@ import { useEvents } from "../hooks/useEvents";
 import TaskCard from "../components/TaskCard";
 import { LinearGradient } from "expo-linear-gradient";
 import HeaderBar from "../components/HeaderBar";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/RootNavigator";
+import { useEffect, useState } from "react";
+
+type HomeRouteProp = RouteProp<RootStackParamList, "Home">;
+
+function getQueryParamFromURL(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
 
 export default function HomeScreen() {
-  const { events, reload } = useEvents();
+  const initialAudience = (() => {
+    if (typeof window === "undefined") return "student";
+    const param = new URLSearchParams(window.location.search).get("audience");
+    return param === "faculty" ? "faculty" : "student";
+  })();
+
+  const { events, reload } = useEvents(initialAudience);
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderBar onReload={reload} />
+      <HeaderBar onReload={reload} audience={initialAudience} />
 
       <FlatList
         data={events}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => <TaskCard event={item} />}
+        renderItem={({ item }) => (
+          <TaskCard event={item} audience={initialAudience} />
+        )}
       />
 
-      {/* Chat bar */}
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.6)"]}
         style={styles.chatBoxHolder}

@@ -7,6 +7,7 @@ import { EventItem } from "../interfaces/events";
 
 type Props = {
   event: EventItem;
+  audience: "student" | "faculty";
 };
 
 const iconMap: Record<string, any> = {
@@ -15,10 +16,10 @@ const iconMap: Record<string, any> = {
   career: require("../../assets/images/categories/career.png"),
   social: require("../../assets/images/categories/social.png"),
   other: require("../../assets/images/categories/bell.png"),
-  user: require("../../assets/images/avatar.png"), // fallback
+  user: require("../../assets/images/student-avatar.png"), // fallback
 };
 
-export default function TaskCard({ event }: Props) {
+export default function TaskCard({ event, audience }: Props) {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -46,7 +47,7 @@ export default function TaskCard({ event }: Props) {
           <Text style={styles.title}>{event.title}</Text>
           <Text style={styles.subtitle}>{event.date}</Text>
         </View>
-        <Feather name="chevron-right" size={18} color="#aaa" />
+        <Feather name="chevron-right" size={20} color="#aaa" />
       </View>
     </Pressable>
   );
@@ -56,27 +57,39 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#111",
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    paddingVertical: 20, // ⬆ a touch more breathing room
+    paddingHorizontal: 18,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: "#222",
   },
   iconImage: {
-    width: 20,
-    height: 20,
+    width: "70%", // <- key: percentage, not px
+    height: "70%",
     resizeMode: "contain",
   },
-  row: { flexDirection: "row", alignItems: "center" },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
   iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#222",
+    width: 52, // big pill
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "#1b1b1b",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 14,
+    marginRight: 18,
   },
+
   texts: { flex: 1 },
-  title: { color: "#fff", fontWeight: "600", marginBottom: 2 },
+
+  title: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
+    marginBottom: 2,
+  },
   subtitle: { color: "#aaa", fontSize: 12 },
 });

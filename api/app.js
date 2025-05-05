@@ -2,7 +2,8 @@
 const express = require("express");
 const cors = require("cors");
 const {
-  fetchPurdueEvents,
+  fetchStudentEvents,
+  fetchFacultyEvents,
   enrichEventsWithDetails,
   formatEventsWithOpenAI,
 } = require("./scraper/modified-event-scrapper");
@@ -21,8 +22,14 @@ router.get("/events", async (req, res) => {
   try {
     console.time("⏱ /api/events");
 
+    const isFaculty = req.query.audience === "faculty";
+
     console.time("Fetch raw events");
-    const rawEvents = await fetchPurdueEvents();
+
+    const rawEvents = isFaculty
+      ? await fetchFacultyEvents()
+      : await fetchStudentEvents();
+
     console.timeEnd("Fetch raw events");
 
     console.time("Enrich events");
@@ -31,7 +38,7 @@ router.get("/events", async (req, res) => {
     console.timeEnd("Enrich events");
     const formatted = enrichedEvents
       .filter((e) => e.title && e.date && e.link && e.description)
-      .slice(0, 7);
+      .slice(0, 10);
     console.log("🚀 Sending", formatted.length, "events to GPT…");
 
     console.time("OpenAI Call");
