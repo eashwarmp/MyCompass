@@ -1,6 +1,8 @@
 // At the top
 const express = require("express");
 const cors = require("cors");
+const redis = require("redis");
+const { promisify } = require("util");
 const {
   fetchStudentEvents,
   fetchFacultyEvents,
@@ -10,6 +12,21 @@ const {
 
 const app = express();
 const PORT = 9000;
+
+// Redis client setup
+const redisClient = redis.createClient({
+  // You can add configuration options here if needed
+  // url: "redis://localhost:6379"
+});
+
+redisClient.on("error", (err) => console.error("Redis Client Error:", err));
+
+// Connect to Redis before promisifying methods
+redisClient.connect().catch(console.error);
+
+// Promisify Redis methods - using the newer Redis client API
+const getAsync = async (key) => await redisClient.get(key);
+const setexAsync = async (key, seconds, value) => await redisClient.setEx(key, seconds, value);
 
 app.use(cors());
 // ✅ allow all origins
@@ -21,9 +38,19 @@ const router = express.Router();
 router.get("/events", async (req, res) => {
   try {
     console.time("⏱ /api/events");
-
+    
     const isFaculty = req.query.audience === "faculty";
-
+    const cacheKey = `events:${isFaculty ? 'faculty' : 'student'}`;
+    
+    // Try to get data from cache first
+    const cachedData = await getAsync(cacheKey);
+    if (cachedData) {
+      console.log("🎯 Cache hit! Returning cached events");
+      console.timeEnd("⏱ /api/events");
+      return res.json(JSON.parse(cachedData));
+    }
+    
+    console.log("❌ Cache miss. Fetching fresh events...");
     console.time("Fetch raw events");
 
     const rawEvents = isFaculty
@@ -43,7 +70,22 @@ router.get("/events", async (req, res) => {
 
     console.time("OpenAI Call");
     const openAIResp = await formatEventsWithOpenAI(formatted);
-    console.timeEnd("Total fetch");
+    
+    // Add this debugging to check if additional_days exists in the response
+    console.log("OpenAI Response Sample:", 
+      openAIResp.slice(0, 2).map(event => ({
+        title: event.title,
+        parsed_date: event.parsed_date,
+        additional_days: event.additional_days,
+        time: event.time
+      }))
+    );
+    
+    console.timeEnd("OpenAI Call");
+    
+    // Cache the result for 1 hour (3600 seconds)
+    await setexAsync(cacheKey, 3600, JSON.stringify(openAIResp));
+    console.log("💾 Cached events for 1 hour");
 
     console.timeEnd("⏱ /api/events");
 
@@ -60,4 +102,10 @@ app.use("/api", router);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  redisClient.quit();
+  process.exit(0);
 });

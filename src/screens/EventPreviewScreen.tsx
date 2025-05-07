@@ -44,7 +44,7 @@ export default function EventPreviewScreen() {
           <Image source={{ uri: event.image }} style={styles.image} />
           <View style={styles.cardContent}>
             <Text style={styles.cardTitle}>{event.title}</Text>
-            <Text style={styles.cardSubtitle}>{event.title}</Text>
+            <Text style={styles.cardSubtitle}>{event.short_description}</Text>
             <Text style={styles.cardLocation}>{event.location}</Text>
 
             <Pressable

@@ -23,6 +23,13 @@ export default function TaskCard({ event, audience }: Props) {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  // Add this debugging
+  console.log(`TaskCard for ${event.title}:`, {
+    parsed_date: event.parsed_date,
+    additional_days: event.additional_days,
+    time: event.time
+  });
+
   return (
     <Pressable
       onPress={() => navigation.navigate("EventPreview", { event })}
@@ -45,7 +52,11 @@ export default function TaskCard({ event, audience }: Props) {
         </View>
         <View style={styles.texts}>
           <Text style={styles.title}>{event.title}</Text>
-          <Text style={styles.subtitle}>{event.date}</Text>
+          <Text style={styles.date}>
+            {event.parsed_date || event.date}
+            {(event.additional_days ?? 0) > 0 && ` +${event.additional_days ?? 0} days`}
+            {event.time && ` • ${event.time}`}
+          </Text>
         </View>
         <Feather name="chevron-right" size={20} color="#aaa" />
       </View>
@@ -91,5 +102,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 2,
   },
-  subtitle: { color: "#aaa", fontSize: 12 },
+  date: { color: "#aaa", fontSize: 12 },
 });

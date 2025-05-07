@@ -12,7 +12,8 @@ const LIST = BASE + "/";
 const STUDENT_URL =
   "https://events.purdue.edu/calendar/upcoming?event_types[]=39925425488556";
 const FACULTY_URL =
-  "https://events.purdue.edu/calendar/day?event_types[]=39925426947703";
+  // "https://events.purdue.edu/calendar/day?event_types[]=39925426947703";
+  "https://events.purdue.edu/calendar/week?card_size=small&order=date&experience=&event_types%5B%5D=39925426947703"
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -27,7 +28,7 @@ function extractDates($detail) {
     .text()
     .trim();
 
-  // “Additional Event Dates:” => aria‑label on .em-list_dates__extra-message
+  // "Additional Event Dates:" => aria‑label on .em-list_dates__extra-message
   const extraMsg =
     $detail("div.em-list_dates__extra-message").attr("aria-label") || "";
   const extraClean = extraMsg
@@ -113,7 +114,7 @@ const openai = new OpenAI({
 }); // grabs key from env
 
 const OPENAI_MODEL = "gpt-4o-mini";
-const BATCH_SIZE = 7; // same as Python
+const BATCH_SIZE = 10; // same as Python
 
 async function formatEventsWithOpenAI(events) {
   if (!events.length) return [];
@@ -132,9 +133,10 @@ Today's date is: ${today}
 
 Your task is to process the following JSON input array:
 - For each event:
-  - Parse the original 'date' field into two new fields:
-    - 'parsed_date': Represent the primary date or date range found (e.g., "Mon, May 5, 2025", "Apr 23 - Apr 25, 2025", "May 15, 2025"). Standardize simple relative dates like "Today" or "Tomorrow" to their actual date based on today's date (${today}). If the input combines multiple dates (e.g. separated by ';'), try to represent the range or the first date clearly. If unparseable, use null.
-    - 'time': extract the time portion (e.g., "3 pm to 4 pm", "10:00 AM - 11:00 AM") or use null if no time is present in the original 'date' field or if multiple times are listed ambiguously.
+  - Parse the original 'date' field into these new fields:
+    - 'parsed_date': Represent ONLY the primary/first date found (e.g., "Mon, May 5, 2025"). Standardize simple relative dates like "Today" or "Tomorrow" to their actual date based on today's date (${today}). If the input combines multiple dates (e.g. separated by ';'), only use the first date. If unparseable, use null.
+    - 'additional_days': If the event spans multiple days or has multiple dates, calculate the total number of additional days beyond the first day. For example, if an event runs May 5-7, this would be 2 (for the 2 days after the first). If there's only one day, set this to 0.
+    - 'time': extract the time portion (e.g., "3 pm to 4 pm", "10:00 AM - 11:00 AM") or use null if no time is present in the original 'date' field or if multiple times are listed ambiguously.
   - Process the 'description' field (if present and not null/empty):
     - Create a new field 'short_description' containing a concise summary (1‑2 sentences) of the original 'description'. Focus on the core activity or purpose.
     - If the original 'description' is null or empty, set 'short_description' to null.
@@ -148,14 +150,14 @@ Return **ONLY** a valid JSON array containing ALL formatted events, sorted by ur
 Also do not return duplicate events. 
 
 Input JSON (${events.length} events):
-${JSON.stringify(events.slice(0, BATCH_SIZE), null, 2)}
+${JSON.stringify(events, null, 2)}
 `;
 
   const t0 = Date.now();
   const completion = await openai.chat.completions.create({
     model: OPENAI_MODEL,
     temperature: 0.2,
-    max_tokens: 4000,
+    max_tokens: 16000,
     messages: [
       { role: "system", content: "You are an expert event data formatter." },
       { role: "user", content: prompt },
