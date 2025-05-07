@@ -109,10 +109,10 @@ async function enrichEventsWithDetails(events) {
 //------------------------------------------------------------------
 const { OpenAI } = require("openai");
 const openai = new OpenAI({
-  apiKey: "",
+  apiKey: process.env.OPENAI_API_KEY,
 }); // grabs key from env
 
-const OPENAI_MODEL = "gpt-4o";
+const OPENAI_MODEL = "gpt-4o-mini";
 const BATCH_SIZE = 7; // same as Python
 
 async function formatEventsWithOpenAI(events) {
