@@ -9,6 +9,10 @@ const cheerio = require("cheerio");
 // ─────────────────────────────────────────────────────────────
 const BASE = "https://events.purdue.edu";
 const LIST = BASE + "/";
+const STUDENT_URL =
+  "https://events.purdue.edu/calendar/upcoming?event_types[]=39925425488556";
+const FACULTY_URL =
+  "https://events.purdue.edu/calendar/day?event_types[]=39925426947703";
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -36,8 +40,8 @@ function extractDates($detail) {
 // ─────────────────────────────────────────────────────────────
 // 1) Scrape list page
 // ─────────────────────────────────────────────────────────────
-async function fetchPurdueEvents() {
-  const listHtml = await axios.get(LIST).then((r) => r.data);
+async function fetchPurdueEvents(url, audience) {
+  const listHtml = await axios.get(url).then((r) => r.data);
   const $ = cheerio.load(listHtml);
   const events = [];
 
@@ -52,12 +56,21 @@ async function fetchPurdueEvents() {
       link: absolute(linkRel),
       image: absolute($el.find("img").attr("src")),
       description: null, // will be filled later
+      audience, // 👈 attach label here
     };
 
     if (ev.title) events.push(ev);
   });
 
   return events;
+}
+
+async function fetchStudentEvents() {
+  return fetchPurdueEvents(STUDENT_URL, "student");
+}
+
+async function fetchFacultyEvents() {
+  return fetchPurdueEvents(FACULTY_URL, "faculty");
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -162,6 +175,8 @@ module.exports = {
   fetchPurdueEvents,
   enrichEventsWithDetails,
   formatEventsWithOpenAI,
+  fetchStudentEvents,
+  fetchFacultyEvents,
 };
 
 // ─────────────────────────────────────────────────────────────
