@@ -99,7 +99,7 @@ const openai = new OpenAI({
   apiKey: "",
 }); // grabs key from env
 
-const OPENAI_MODEL = "gpt-3.5-turbo";
+const OPENAI_MODEL = "gpt-4o";
 const BATCH_SIZE = 7; // same as Python
 
 async function formatEventsWithOpenAI(events) {
