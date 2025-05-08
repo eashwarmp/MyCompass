@@ -20,20 +20,6 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-    scaling:
-      minInstances: 1
-      maxInstances: 1
-    disk:
-      name: tmp
-      mountPath: /tmp
-      sizeGB: 1
 
   # Frontend Expo Service
   - type: web
@@ -55,22 +41,8 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: Cache-Control
-        value: no-cache, no-store, must-revalidate
-    scaling:
-      minInstances: 1
-      maxInstances: 1
 
 databases:
   - name: acapal-events-redis
-    databaseName: acapal-events-redis
     plan: free
     ipAllowList: []
