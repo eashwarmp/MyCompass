@@ -1,0 +1,57 @@
+services:
+  # --- Backend ------------------------------------------------
+  - type: web
+    name: acapal-events-api
+    env: node
+    buildCommand: cd api && npm install
+    startCommand: cd api && node app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        fromDatabase:
+          name: acapal-events-redis
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+    healthCheckPath: /api/events
+    autoDeploy: true
+    plan: free
+    numInstances: 1
+    nodeVersion: 18.17.0
+    envVars:
+      - key: PORT
+        value: 10000
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 1
+
+  # --- Front-end ---------------------------------------------
+  - type: static
+    name: acapal-events-web
+    rootDir: web
+    buildCommand: |
+      npm install
+      npm run build
+    staticPublishPath: build          # or "dist" for Vite/Expo
+    envVars:
+      - key: REACT_APP_API_URL        # makes front-end call the API
+        value: https://acapal-events-api.onrender.com
+    plan: free
+
+databases:
+  - name: acapal-events-redis
+    databaseName: acapal-events-redis
+    plan: free
+    ipAllowList: []

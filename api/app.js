@@ -11,12 +11,11 @@ const {
 } = require("./scraper/modified-event-scrapper");
 
 const app = express();
-const PORT = 9000;
+const PORT = process.env.PORT || 9000;
 
 // Redis client setup
 const redisClient = redis.createClient({
-  // You can add configuration options here if needed
-  // url: "redis://localhost:6379"
+  url: process.env.REDIS_URL || "redis://localhost:6379"
 });
 
 redisClient.on("error", (err) => console.error("Redis Client Error:", err));
