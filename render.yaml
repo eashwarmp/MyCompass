@@ -26,8 +26,8 @@ services:
     buildCommand: |
       npm install
       npm install -g expo-cli
-      npx expo export:web
-    startCommand: npx serve web-build
+      npx expo export --platform web
+    startCommand: npx serve dist/web
     envVars:
       - key: NODE_ENV
         value: production
@@ -39,3 +39,4 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
+

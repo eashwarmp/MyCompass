@@ -28,8 +28,9 @@ export function useEvents(audienceOverride?: string) {
 
   async function fetchEvents() {
     try {
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || process.env.REACT_APP_API_URL || "http://localhost:9000";
       const { data } = await axios.get<EventItem[]>(
-        `http://localhost:9000/api/events?audience=${audience}`
+        `${API_URL}/api/events?audience=${audience}`
       );
       setEvents(data);
     } catch (err) {
