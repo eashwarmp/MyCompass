@@ -27,7 +27,7 @@ services:
       npm install
       npm install -g expo-cli
       npx expo export --platform web
-    startCommand: npx serve dist/web
+    startCommand: npx serve dist/web --single
     envVars:
       - key: NODE_ENV
         value: production
