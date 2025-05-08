@@ -14,14 +14,13 @@ services:
           property: connectionString
       - key: OPENAI_API_KEY
         sync: false
+      - key: PORT
+        value: 10000
     healthCheckPath: /api/events
     autoDeploy: true
     plan: free
     numInstances: 1
     nodeVersion: 18.17.0
-    envVars:
-      - key: PORT
-        value: 10000
     headers:
       - path: /*
         name: X-Frame-Options
@@ -43,12 +42,15 @@ services:
     env: node
     buildCommand: |
       npm install
+      npm install -g expo-cli
       npx expo export:web
     startCommand: npx serve web-build
     envVars:
       - key: NODE_ENV
         value: production
       - key: REACT_APP_API_URL
+        value: https://acapal-events-api.onrender.com
+      - key: EXPO_PUBLIC_API_URL
         value: https://acapal-events-api.onrender.com
     healthCheckPath: /
     autoDeploy: true
@@ -62,6 +64,9 @@ services:
       - path: /*
         name: X-Content-Type-Options
         value: nosniff
+      - path: /*
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
     scaling:
       minInstances: 1
       maxInstances: 1
