@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: REDIS_URL
-        sync: false
+        value: rediss://default:ATOAAAIjcDE3YTNkNmUxNjZlZDI0OGIwODI2MjUxNTM5MDUwZWQyYnAxMA@logical-mosquito-13184.upstash.io:6379
       - key: OPENAI_API_KEY
         sync: false
       - key: PORT
