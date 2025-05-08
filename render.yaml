@@ -20,7 +20,6 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
-    nodeVersion: 18.17.0
     headers:
       - path: /*
         name: X-Frame-Options
@@ -56,7 +55,6 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
-    nodeVersion: 18.17.0
     headers:
       - path: /*
         name: X-Frame-Options
