@@ -9,9 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: REDIS_URL
-        fromDatabase:
-          name: acapal-events-redis
-          property: connectionString
+        sync: false
       - key: OPENAI_API_KEY
         sync: false
       - key: PORT
@@ -41,8 +39,3 @@ services:
     autoDeploy: true
     plan: free
     numInstances: 1
-
-databases:
-  - name: acapal-events-redis
-    plan: free
-    ipAllowList: []
